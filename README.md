@@ -1,5 +1,9 @@
 # super-select-plus
 
+### 描述
+
+基于 super-select 的 React 业务选择器组件库，提供职能、行业、城市选择器与枚举显示组件，支持国际化与拼音搜索
+
 ### 安装
 
 ```shell
