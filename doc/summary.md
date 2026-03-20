@@ -1,91 +1,31 @@
-### 项目概述
-
-`@kne/super-select-plus` 是一个基于 `@kne/super-select` 封装的 React 业务选择器组件库，提供职能、行业、城市等常见业务场景的选择器组件。所有组件均支持国际化、拼音搜索、单选/多选等功能。
+`@kne/super-select-plus` 是一个基于 `@kne/super-select` 封装的 React
+业务选择器组件库，提供职能、行业、城市等常见业务场景的选择器组件和枚举值显示组件。所有组件均支持国际化、拼音搜索、单选/多选等功能，枚举显示组件使用
+`react-fetch` 统一管理数据加载和缓存。
 
 ### 主要特性
 
 - **丰富的业务选择器**：提供职能选择器、行业选择器、城市选择器三大核心组件
+- **枚举值显示组件**：提供地址、职能、行业等枚举值的统一显示组件
 - **级联选择支持**：职能和行业选择器基于级联选择器实现，支持多级数据选择
 - **智能搜索**：支持中英文搜索、拼音搜索、首字母搜索
 - **国际化支持**：内置中英文切换，可根据语言环境自动切换显示内容
 - **灵活的展示模式**：支持下拉菜单和弹窗两种展示模式
 - **数量限制**：支持设置最大选择数量
 - **单选/多选**：所有组件均支持单选和多选模式
+- **数据缓存**：枚举显示组件内置多层缓存机制，提升性能
+- **自定义渲染**：枚举显示组件支持自定义渲染函数，灵活展示
 
 ### 组件列表
 
-| 组件名称 | 功能描述 | 基础组件 |
-|---------|---------|---------|
-| FunctionSelectField | 职能选择器，支持多级职能数据选择 | SelectCascader |
-| IndustrySelectField | 行业选择器，支持多级行业数据选择 | SelectCascader |
-| AddressSelectField | 城市选择器，支持国内外城市搜索选择 | SelectInput |
-
-### 快速选择指南
-
-| 需求 | 推荐组件 |
-|------|---------|
-| 招聘系统职能选择 | FunctionSelectField |
-| 企业行业分类选择 | IndustrySelectField |
-| 地址填写、城市筛选 | AddressSelectField |
-| 需要多级联动选择 | FunctionSelectField 或 IndustrySelectField |
-| 需要快速搜索选择 | AddressSelectField |
-
-### 安装
-
-```bash
-npm install @kne/super-select-plus
-```
-
-### 快速开始
-
-```jsx
-import { FunctionSelectField, IndustrySelectField, AddressSelectField } from '@kne/super-select-plus';
-import '@kne/super-select-plus/dist/index.css';
-
-// 职能选择
-function FunctionExample() {
-  const [value, setValue] = useState([]);
-  return (
-    <FunctionSelectField
-      value={value}
-      onChange={setValue}
-      placeholder="请选择职能"
-    />
-  );
-}
-
-// 行业选择
-function IndustryExample() {
-  const [value, setValue] = useState(null);
-  return (
-    <IndustrySelectField
-      single
-      value={value}
-      onChange={setValue}
-      placeholder="请选择行业"
-    />
-  );
-}
-
-// 城市选择
-function AddressExample() {
-  const [value, setValue] = useState([]);
-  return (
-    <AddressSelectField
-      value={value}
-      onChange={setValue}
-      placeholder="请选择城市"
-    />
-  );
-}
-```
-
-### 技术栈
-
-- React 18+
-- @kne/super-select - 核心选择器组件库
-- @kne/react-intl - 国际化支持
-- lodash - 工具函数库
+| 组件名称           | 功能描述              |
+|----------------|-------------------|
+| SelectFunction | 职能选择器，支持多级职能数据选择  |
+| SelectIndustry | 行业选择器，支持多级行业数据选择  |
+| SelectAddress  | 城市选择器，支持国内外城市搜索选择 |
+| AddressEnum    | 地址枚举显示，用于显示城市名称   |
+| FunctionEnum   | 职能枚举显示，用于显示职能名称   |
+| IndustryEnum   | 行业枚举显示，用于显示行业名称   | 
+| EnumDisplay    | 通用枚举显示，支持自定义数据源   |
 
 ### 数据来源
 

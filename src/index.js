@@ -1,15 +1,19 @@
-import FunctionSelectField from './FunctionSelectField';
-import IndustrySelectField from './IndustrySelectField';
-import AddressSelectField, { AddressEnum, createAddressApi, getLabelForLocal } from './AddressSelectField';
+import SelectFunction, { FunctionEnum } from './SelectFunction';
+import SelectIndustry, { IndustryEnum } from './SelectIndustry';
+import SelectAddress, { AddressEnum, createAddressApi } from './SelectAddress';
+import EnumDisplay from './EnumDisplay';
 import '@kne/super-select/dist/index.css';
 
 // 导出组件
-export { FunctionSelectField, IndustrySelectField, AddressSelectField, AddressEnum, createAddressApi, getLabelForLocal };
+export { SelectFunction, SelectIndustry, SelectAddress, AddressEnum, createAddressApi, FunctionEnum, IndustryEnum, EnumDisplay };
 
 // 默认导出
 export default {
-  FunctionSelectField,
-  IndustrySelectField,
-  AddressSelectField,
-  AddressEnum
+  SelectFunction,
+  SelectIndustry,
+  SelectAddress,
+  AddressEnum,
+  FunctionEnum,
+  IndustryEnum,
+  EnumDisplay
 };

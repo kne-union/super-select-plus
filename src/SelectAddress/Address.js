@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import memoize from 'lodash/memoize';
 import cloneDeep from 'lodash/cloneDeep';
 import { Col, Divider, List, Row, Space, Tabs, Tag } from 'antd';
+import AddressEnum from './AddressEnum';
 import SearchInput from '@kne/search-input';
 import '@kne/search-input/dist/index.css';
 import classnames from 'classnames';
@@ -18,7 +19,7 @@ const getLabelForLocal = (item, locale) => {
   return get(item, 'name');
 };
 
-const defaultCityData = () => {
+export const defaultCityData = () => {
   return import('./city.json').then(module => (module['__esModule'] ? module.default : module));
 };
 
@@ -327,7 +328,7 @@ const AddressInner = ({ value, setValue, props }) => {
   );
 };
 
-const AddressSelectFieldInner = forwardRef((props, ref) => {
+const SelectAddressInner = forwardRef((props, ref) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -340,19 +341,13 @@ const AddressSelectFieldInner = forwardRef((props, ref) => {
   );
 });
 
-const AddressSelectField = withLocale(AddressSelectFieldInner, 'AddressSelectField');
+const SelectAddress = withLocale(({ single = false, isPopup = true, showChinaQuan = false, showForeignQuan = false, ...props }) => {
+  return <SelectAddressInner single={single} isPopup={isPopup} showChinaQuan={showChinaQuan} showForeignQuan={showForeignQuan} {...props} />;
+}, 'SelectAddress');
 
-AddressSelectField.defaultProps = {
-  overlayWidth: '500px',
-  single: false,
-  isPopup: true,
-  showChinaQuan: false,
-  showForeignQuan: false
-};
+SelectAddress.defaultData = defaultCityData;
+SelectAddress.createAddressApi = createAddressApi;
+SelectAddress.Enum = AddressEnum;
 
-AddressSelectField.defaultData = defaultCityData;
-AddressSelectField.createAddressApi = createAddressApi;
-AddressSelectField.getLabelForLocal = getLabelForLocal;
-
-export default AddressSelectField;
-export { createAddressApi, getLabelForLocal };
+export default SelectAddress;
+export { createAddressApi };

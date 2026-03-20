@@ -1,4 +1,4 @@
-const { FunctionSelectField } = _SuperSelectPlus;
+const { SelectAddress } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
 
@@ -8,18 +8,18 @@ const BasicMultiExample = ({ isPopup }) => {
 
   return (
     <Flex vertical gap={8}>
-      <span>多选职能：</span>
-      <FunctionSelectField
+      <span>多选城市：</span>
+      <SelectAddress
         value={value}
         onChange={setValue}
         isPopup={isPopup}
-        placeholder="请选择职能"
+        placeholder="请选择城市"
         style={{ width: 320 }}
       />
       {value.length > 0 && (
         <Flex wrap gap={4}>
           {value.map((item) => (
-            <Tag key={item.id} color="blue">
+            <Tag key={item.code} color="blue">
               {item.name}
             </Tag>
           ))}
@@ -35,13 +35,13 @@ const SingleSelectExample = ({ isPopup }) => {
 
   return (
     <Flex vertical gap={8}>
-      <span>单选职能：</span>
-      <FunctionSelectField
+      <span>单选城市：</span>
+      <SelectAddress
         single
         value={value}
         onChange={setValue}
         isPopup={isPopup}
-        placeholder="请选择职能"
+        placeholder="请选择城市"
         style={{ width: 320 }}
       />
       {value && <Tag color="green">已选：{value.name}</Tag>}
@@ -55,39 +55,18 @@ const MaxLimitExample = ({ isPopup }) => {
 
   return (
     <Flex vertical gap={8}>
-      <span>最多选择 3 个职能：</span>
-      <FunctionSelectField
+      <span>最多选择 5 个城市：</span>
+      <SelectAddress
         value={value}
         onChange={setValue}
         isPopup={isPopup}
-        maxLength={3}
-        placeholder="请选择职能（最多3项）"
+        maxLength={5}
+        placeholder="请选择城市（最多5项）"
         style={{ width: 320 }}
       />
-      <Tag color={value.length >= 3 ? 'red' : 'blue'}>
-        已选择 {value.length}/3 项
+      <Tag color={value.length >= 5 ? 'red' : 'blue'}>
+        已选择 {value.length}/5 项
       </Tag>
-    </Flex>
-  );
-};
-
-// 弹窗模式示例
-const PopupModeExample = () => {
-  const [value, setValue] = useState([]);
-
-  return (
-    <Flex vertical gap={8}>
-      <span>弹窗模式：</span>
-      <FunctionSelectField
-        value={value}
-        onChange={setValue}
-        isPopup={false}
-        placeholder="点击打开弹窗选择"
-        style={{ width: 320 }}
-      />
-      {value.length > 0 && (
-        <div>已选：{value.map((item) => item.name).join('、')}</div>
-      )}
     </Flex>
   );
 };
@@ -115,8 +94,6 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
-      <Divider />
-      <PopupModeExample />
     </Flex>
   );
 };

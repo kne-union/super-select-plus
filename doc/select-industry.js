@@ -1,4 +1,4 @@
-const { IndustrySelectField } = _SuperSelectPlus;
+const { SelectIndustry } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
 
@@ -9,7 +9,7 @@ const BasicMultiExample = ({ isPopup }) => {
   return (
     <Flex vertical gap={8}>
       <span>多选行业：</span>
-      <IndustrySelectField
+      <SelectIndustry
         value={value}
         onChange={setValue}
         isPopup={isPopup}
@@ -36,7 +36,7 @@ const SingleSelectExample = ({ isPopup }) => {
   return (
     <Flex vertical gap={8}>
       <span>单选行业：</span>
-      <IndustrySelectField
+      <SelectIndustry
         single
         value={value}
         onChange={setValue}
@@ -56,7 +56,7 @@ const MaxLimitExample = ({ isPopup }) => {
   return (
     <Flex vertical gap={8}>
       <span>最多选择 3 个行业：</span>
-      <IndustrySelectField
+      <SelectIndustry
         value={value}
         onChange={setValue}
         isPopup={isPopup}

@@ -3,25 +3,16 @@ import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import { useState, useEffect, useMemo } from 'react';
 import get from 'lodash/get';
+import FunctionEnum, { getLabelForLocal } from './FunctionEnum';
 
-const getLabelForLocal = (item, locale) => {
-  if (locale === 'en-US') {
-    return get(item, 'enName') || get(item, 'chName');
-  }
-  return get(item, 'chName');
-};
-
-const defaultIndustryData = () => {
-  return import('./industry.json').then(module => (module['__esModule'] ? module.default : module));
+const defaultFunctionData = () => {
+  return import('./function.json').then(module => (module['__esModule'] ? module.default : module));
 };
 
 const transformToCascaderData = (data, locale) => {
-  // 过滤掉"全部行业"
-  const filteredData = data.filter(item => item.code !== '000');
-
   // 创建映射表
   const mapping = new Map();
-  filteredData.forEach(item => {
+  data.forEach(item => {
     mapping.set(item.code, {
       ...item,
       id: item.code,
@@ -32,7 +23,7 @@ const transformToCascaderData = (data, locale) => {
 
   // 构建嵌套结构
   const roots = [];
-  filteredData.forEach(item => {
+  data.forEach(item => {
     const node = mapping.get(item.code);
     if (!item.parentCode || !mapping.has(item.parentCode)) {
       roots.push(node);
@@ -57,12 +48,12 @@ const transformToCascaderData = (data, locale) => {
   return roots;
 };
 
-const IndustrySelectFieldInner = ({ value, onChange, single, placeholder, isPopup, overlayWidth, apis: currentApis, onSearch, ...props }) => {
+const SelectFunctionInner = ({ value, onChange, single = false, placeholder, isPopup = true, overlayWidth = 320, apis: currentApis, onSearch, ...props }) => {
   const { locale, formatMessage } = useIntl();
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    defaultIndustryData().then(result => {
+    defaultFunctionData().then(result => {
       setData(result.data || result);
     });
   }, []);
@@ -88,10 +79,10 @@ const IndustrySelectFieldInner = ({ value, onChange, single, placeholder, isPopu
       value={value}
       onChange={onChange}
       single={single}
-      placeholder={placeholder || formatMessage({ id: 'placeholder' }, { defaultMessage: '请选择行业' })}
+      placeholder={placeholder || formatMessage({ id: 'placeholder' }, { defaultMessage: '请选择职能' })}
       isPopup={isPopup}
       menuItemWidth={200}
-      style={{ width: overlayWidth || 320, ...props.style }}
+      style={{ width: overlayWidth, ...props.style }}
       options={options}
       valueKey="id"
       labelKey="name"
@@ -100,14 +91,10 @@ const IndustrySelectFieldInner = ({ value, onChange, single, placeholder, isPopu
   );
 };
 
-const IndustrySelectField = withLocale(IndustrySelectFieldInner);
+const SelectFunction = withLocale(SelectFunctionInner);
 
-IndustrySelectField.defaultProps = {
-  overlayWidth: '320px',
-  single: false,
-  isPopup: true
-};
+SelectFunction.defaultData = defaultFunctionData;
+SelectFunction.Enum = FunctionEnum;
 
-IndustrySelectField.defaultData = defaultIndustryData;
-
-export default IndustrySelectField;
+export default SelectFunction;
+export { FunctionEnum };
