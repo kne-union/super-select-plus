@@ -1,0 +1,56 @@
+{
+  "isFull": false,
+  "list": [
+    {
+      "title": "FunctionSelectField 职能选择器",
+      "description": "基于级联选择器的职能选择组件，支持多级职能数据的选择，具备搜索、单选/多选等功能",
+      "code": "./function-select-field.js",
+      "scope": [
+        {
+          "name": "_SuperSelectPlus",
+          "packageName": "@kne/current-lib_super-select-plus",
+          "importStatement": "import * as _SuperSelectPlus from \"@kne/super-select-plus\""
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "IndustrySelectField 行业选择器",
+      "description": "基于级联选择器的行业选择组件，支持多级行业数据的选择，具备搜索、单选/多选等功能",
+      "code": "./industry-select-field.js",
+      "scope": [
+        {
+          "name": "_SuperSelectPlus",
+          "packageName": "@kne/current-lib_super-select-plus",
+          "importStatement": "import * as _SuperSelectPlus from \"@kne/super-select-plus\""
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "AddressSelectField 城市选择器",
+      "description": "城市地址选择组件，支持国内外城市搜索选择，具备拼音搜索、首字母搜索等功能",
+      "code": "./address-select-field.js",
+      "scope": [
+        {
+          "name": "_SuperSelectPlus",
+          "packageName": "@kne/current-lib_super-select-plus",
+          "importStatement": "import * as _SuperSelectPlus from \"@kne/super-select-plus\""
+        },
+        {
+          "packageName": "@kne/current-lib_super-select-plus/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    }
+  ]
+}
