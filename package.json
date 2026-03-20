@@ -1,7 +1,7 @@
 {
   "name": "@kne/super-select-plus",
   "version": "0.1.0",
-  "description": "",
+  "description": "基于 super-select 的 React 业务选择器组件库，提供职能、行业、城市选择器与枚举显示组件，支持国际化与拼音搜索",
   "syntax": {
     "esmodules": true
   },
@@ -46,7 +46,23 @@
     "type": "git",
     "url": "git+https://github.com/kne-union/super-select-plus.git"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "antd",
+    "select",
+    "cascader",
+    "super-select",
+    "picker",
+    "enum",
+    "i18n",
+    "pinyin",
+    "multiselect",
+    "cascade",
+    "address-select",
+    "city-select",
+    "function-select",
+    "industry-select"
+  ],
   "author": "linzp",
   "license": "ISC",
   "bugs": {
