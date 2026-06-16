@@ -53,15 +53,27 @@ const BaseExample = createWithRemoteLoader({
         </InfoPage.Part>
         
         <InfoPage.Part title="行业标签展示">
-          <Flex gap={8}>
-            <IndustryEnum name="001">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>{item.label}</span>}
+          <Flex gap={8} wrap="wrap">
+            <IndustryEnum names={['001', '003', '004']}>
+              {(items, { labels }) => labels.map(label => (
+                <span key={label} style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>
+                  {label}
+                </span>
+              ))}
             </IndustryEnum>
-            <IndustryEnum name="003">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#f6ffed', borderRadius: '4px' }}>{item.label}</span>}
-            </IndustryEnum>
-            <IndustryEnum name="004">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#fff7e6', borderRadius: '4px' }}>{item.label}</span>}
+          </Flex>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染（逗号分隔）：<IndustryEnum names={['001', '003', '004']} /></p>
+            <IndustryEnum names={['001', '004']}>
+              {(items, { labels, locale }) => (
+                <div>
+                  <div style={{ marginBottom: 8 }}>当前语言：{locale}</div>
+                  <div>{labels.join(' · ')}</div>
+                </div>
+              )}
             </IndustryEnum>
           </Flex>
         </InfoPage.Part>

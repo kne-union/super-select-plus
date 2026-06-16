@@ -8,7 +8,56 @@ import get from 'lodash/get';
 const enumCache = new Map();
 
 // 默认子组件渲染函数
-const defaultChildren = item => get(item, 'label', '');
+const defaultChildren = output => {
+  if (Array.isArray(output)) {
+    return output
+      .map(item => get(item, 'label', ''))
+      .filter(Boolean)
+      .toString();
+  }
+  return get(output, 'label', '');
+};
+
+const getLabels = output => (Array.isArray(output) ? output.map(item => get(item, 'label', '')).filter(Boolean) : output ? [get(output, 'label', '')].filter(Boolean) : []);
+
+const resolveOutput = (mapping, name, names) => {
+  if (names) {
+    return names.map(code => mapping.get(code));
+  }
+  return mapping.get(name);
+};
+
+const cacheOutput = (output, { cacheKey, type, name, names }) => {
+  if (!cacheKey || !type) {
+    return;
+  }
+  if (names) {
+    names.forEach((code, index) => {
+      const item = output[index];
+      if (item) {
+        enumCache.set(`${cacheKey}_${type}_${code}`, item);
+      }
+    });
+    return;
+  }
+  if (output) {
+    enumCache.set(`${cacheKey}_${type}_${name}`, output);
+  }
+};
+
+const getCachedOutput = ({ cacheKey, type, name, names, force }) => {
+  if (force) {
+    return null;
+  }
+  if (names?.length) {
+    const items = names.map(code => enumCache.get(`${cacheKey}_${type}_${code}`));
+    return items.every(Boolean) ? items : null;
+  }
+  if (name == null) {
+    return null;
+  }
+  return enumCache.get(`${cacheKey}_${type}_${name}`) ?? null;
+};
 
 /**
  * 默认获取标签函数
@@ -38,7 +87,7 @@ const defaultTransformItem = (item, label) => ({
 /**
  * 内部枚举显示组件
  */
-const EnumDisplayInner = withFetch(({ data, name, type, cache: cacheKey, children, getLabel, dataFormat, transformItem, ...props }) => {
+const EnumDisplayInner = withFetch(({ data, name, names, type, cache: cacheKey, children, getLabel, dataFormat, transformItem, ...props }) => {
   const { locale } = useIntl();
 
   // 格式化数据
@@ -55,30 +104,23 @@ const EnumDisplayInner = withFetch(({ data, name, type, cache: cacheKey, childre
     );
   }, [formattedData, getLabel, locale, transformItem]);
 
-  // 获取枚举值
-  const output = mapping.get(name);
+  const output = useMemo(() => resolveOutput(mapping, name, names), [mapping, name, names]);
 
-  // 缓存结果
-  if (output && cacheKey && type) {
-    enumCache.set(`${cacheKey}_${type}_${name}`, output);
-  }
+  cacheOutput(output, { cacheKey, type, name, names });
 
-  return children(output, { ...props, locale, mapping });
+  return children(output, { ...props, locale, mapping, names, labels: getLabels(output) });
 });
 
 /**
  * 枚举显示组件
  */
 export const EnumDisplay = withLocale(props => {
-  const { locale } = useIntl();
-  const { name, type = 'default', cache: cacheKey = 'ENUM_DATA', force = false, getLabel = defaultGetLabel, dataFormat = defaultDataFormat, transformItem = defaultTransformItem, children = defaultChildren } = props;
+  const { name, names, type = 'default', cache: cacheKey = 'ENUM_DATA', force = false, getLabel = defaultGetLabel, dataFormat = defaultDataFormat, transformItem = defaultTransformItem, children = defaultChildren } = props;
 
-  // 检查缓存
-  const key = `${cacheKey}_${type}_${name}`;
-  const cached = enumCache.get(key);
+  const cached = getCachedOutput({ cacheKey, type, name, names, force });
 
-  if (cached && !force) {
-    return children(cached, { locale: props.locale });
+  if (cached) {
+    return children(cached, { locale: props.locale, names, labels: getLabels(cached) });
   }
 
   return <EnumDisplayInner {...props} type={type} cache={cacheKey} getLabel={getLabel} dataFormat={dataFormat} transformItem={transformItem} children={children} />;
@@ -99,14 +141,12 @@ export const createEnumComponent = options => {
   const { type, cache, getLabel = defaultGetLabel, dataFormat = defaultDataFormat, transformItem = defaultTransformItem, defaultApi } = options;
 
   const EnumComponent = withLocale(props => {
-    const { name, force = false, children = defaultChildren } = props;
+    const { name, names, force = false, children = defaultChildren } = props;
 
-    // 检查缓存
-    const key = `${cache}_${type}_${name}`;
-    const cached = enumCache.get(key);
+    const cached = getCachedOutput({ cacheKey: cache, type, name, names, force });
 
-    if (cached && !force) {
-      return children(cached, { locale: props.locale });
+    if (cached) {
+      return children(cached, { locale: props.locale, names, labels: getLabels(cached) });
     }
 
     return <EnumDisplayInner {...props} {...defaultApi} type={type} cache={cache} getLabel={getLabel} dataFormat={dataFormat} transformItem={transformItem} children={children} />;

@@ -63,7 +63,25 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>李四</div>
             <div><strong>当前职能：</strong><FunctionEnum name="001001001" /></div>
             <div><strong>期望职能：</strong><FunctionEnum name="001001002" /></div>
+            <div><strong>可胜任职能：</strong><FunctionEnum names={['001001001', '001001002', '001001003']} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染：<FunctionEnum names={['001001001', '001001002', '001001003']} /></p>
+            <FunctionEnum names={['001001001', '001001002']}>
+              {(items, { labels }) => (
+                <Flex gap={8} wrap="wrap">
+                  {labels.map(label => (
+                    <span key={label} style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>
+                      {label}
+                    </span>
+                  ))}
+                </Flex>
+              )}
+            </FunctionEnum>
+          </Flex>
         </InfoPage.Part>
         
         <InfoPage.Part title="国际化支持">

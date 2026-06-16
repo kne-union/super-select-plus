@@ -205,7 +205,8 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 职能编码，必需 |
+| name | string | - | 职能编码，与 names 二选一 |
+| names | string[] | - | 职能编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
 | api | object | - | 自定义 API 配置 |
@@ -213,11 +214,20 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 职能数据对象，包含 label, chName, enName 等
   // locale: 当前语言环境
   // mapping: 所有职能数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 职能数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -234,6 +244,9 @@ children={(item, { locale, mapping }) => {
 // 基本用法
 <FunctionEnum name="001001001" />
 
+// 批量显示
+<FunctionEnum names={['001001001', '001001002', '001001003']} />
+
 // 自定义渲染
 <FunctionEnum name="001001001">
   {(item, { locale }) => (
@@ -242,6 +255,11 @@ children={(item, { locale, mapping }) => {
       {item.enName && <span>({item.enName})</span>}
     </div>
   )}
+</FunctionEnum>
+
+// 批量自定义渲染
+<FunctionEnum names={['001001001', '001001002']}>
+  {(items, { labels }) => labels.join(' / ')}
 </FunctionEnum>
 ```
 
@@ -255,7 +273,8 @@ children={(item, { locale, mapping }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 行业编码，必需 |
+| name | string | - | 行业编码，与 names 二选一 |
+| names | string[] | - | 行业编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
 | api | object | - | 自定义 API 配置 |
@@ -263,11 +282,20 @@ children={(item, { locale, mapping }) => {
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 行业数据对象，包含 label, chName, enName 等
   // locale: 当前语言环境
   // mapping: 所有行业数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 行业数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -284,6 +312,9 @@ children={(item, { locale, mapping }) => {
 // 基本用法
 <IndustryEnum name="001" />
 
+// 批量显示
+<IndustryEnum names={['001', '003', '004']} />
+
 // 自定义渲染
 <IndustryEnum name="001">
   {(item, { locale }) => (
@@ -292,6 +323,11 @@ children={(item, { locale, mapping }) => {
       {item.enName && <span>({item.enName})</span>}
     </div>
   )}
+</IndustryEnum>
+
+// 批量自定义渲染
+<IndustryEnum names={['001', '004']}>
+  {(items, { labels }) => labels.join(' · ')}
 </IndustryEnum>
 ```
 
@@ -305,7 +341,8 @@ children={(item, { locale, mapping }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 枚举值编码，必需 |
+| name | string | - | 单个枚举值编码，与 names 二选一 |
+| names | string[] | - | 多个枚举值编码，与 name 二选一，默认 label 数组 toString 输出 |
 | type | string | - | 枚举类型标识 |
 | cache | string | 'ENUM_DATA' | 缓存键名 |
 | force | boolean | false | 是否强制刷新缓存 |
@@ -337,11 +374,21 @@ api={{
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 枚举数据对象
   // locale: 当前语言环境
   // mapping: 所有枚举数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 枚举数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  // names: 传入的编码数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -361,6 +408,13 @@ children={(item, { locale, mapping }) => {
   }}
 />
 
+// 批量显示
+<EnumDisplay
+  names={['1', '2', '3']}
+  type="education"
+  api={educationEnumApi}
+/>
+
 // 自定义 getLabel
 <EnumDisplay
   name="1"
@@ -370,6 +424,11 @@ children={(item, { locale, mapping }) => {
     return locale === 'en-US' ? item.enName : item.name;
   }}
 />
+
+// 批量自定义渲染
+<EnumDisplay names={['1', '2', '3']} type="education" api={api}>
+  {(items, { labels }) => labels.join(' / ')}
+</EnumDisplay>
 ```
 
 ---
