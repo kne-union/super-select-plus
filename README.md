@@ -28,6 +28,7 @@ npm i --save @kne/super-select-plus
 - **单选/多选**：所有组件均支持单选和多选模式
 - **数据缓存**：枚举显示组件内置多层缓存机制，提升性能
 - **自定义渲染**：枚举显示组件支持自定义渲染函数，灵活展示
+- **批量显示**：枚举显示组件支持 `names` 数组，一次转换多个编码为 label
 
 ### 组件列表
 
@@ -486,7 +487,7 @@ render(<BaseExample />);
 ```
 
 - FunctionEnum 职能枚举显示
-- 用于显示职能名称的枚举组件，支持国际化、自定义渲染等功能
+- 用于显示职能名称的枚举组件，支持国际化、自定义渲染及 names 批量显示
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],antd(antd),remoteLoader(@kne/remote-loader)
 
 ```jsx
@@ -555,7 +556,25 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>李四</div>
             <div><strong>当前职能：</strong><FunctionEnum name="001001001" /></div>
             <div><strong>期望职能：</strong><FunctionEnum name="001001002" /></div>
+            <div><strong>可胜任职能：</strong><FunctionEnum names={['001001001', '001001002', '001001003']} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染：<FunctionEnum names={['001001001', '001001002', '001001003']} /></p>
+            <FunctionEnum names={['001001001', '001001002']}>
+              {(items, { labels }) => (
+                <Flex gap={8} wrap="wrap">
+                  {labels.map(label => (
+                    <span key={label} style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>
+                      {label}
+                    </span>
+                  ))}
+                </Flex>
+              )}
+            </FunctionEnum>
+          </Flex>
         </InfoPage.Part>
         
         <InfoPage.Part title="国际化支持">
@@ -580,7 +599,7 @@ render(<BaseExample />);
 ```
 
 - IndustryEnum 行业枚举显示
-- 用于显示行业名称的枚举组件，支持国际化、自定义渲染等功能
+- 用于显示行业名称的枚举组件，支持国际化、自定义渲染及 names 批量显示
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],antd(antd),remoteLoader(@kne/remote-loader)
 
 ```jsx
@@ -639,15 +658,27 @@ const BaseExample = createWithRemoteLoader({
         </InfoPage.Part>
         
         <InfoPage.Part title="行业标签展示">
-          <Flex gap={8}>
-            <IndustryEnum name="001">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>{item.label}</span>}
+          <Flex gap={8} wrap="wrap">
+            <IndustryEnum names={['001', '003', '004']}>
+              {(items, { labels }) => labels.map(label => (
+                <span key={label} style={{ padding: '4px 8px', background: '#e6f7ff', borderRadius: '4px' }}>
+                  {label}
+                </span>
+              ))}
             </IndustryEnum>
-            <IndustryEnum name="003">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#f6ffed', borderRadius: '4px' }}>{item.label}</span>}
-            </IndustryEnum>
-            <IndustryEnum name="004">
-              {(item) => item && <span style={{ padding: '4px 8px', background: '#fff7e6', borderRadius: '4px' }}>{item.label}</span>}
+          </Flex>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染（逗号分隔）：<IndustryEnum names={['001', '003', '004']} /></p>
+            <IndustryEnum names={['001', '004']}>
+              {(items, { labels, locale }) => (
+                <div>
+                  <div style={{ marginBottom: 8 }}>当前语言：{locale}</div>
+                  <div>{labels.join(' · ')}</div>
+                </div>
+              )}
             </IndustryEnum>
           </Flex>
         </InfoPage.Part>
@@ -661,7 +692,7 @@ render(<BaseExample />);
 ```
 
 - EnumDisplay 通用枚举显示
-- 通用枚举显示组件，支持自定义数据源、国际化、缓存等功能
+- 通用枚举显示组件，支持自定义数据源、国际化、缓存及 names 批量显示
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],antd(antd),remoteLoader(@kne/remote-loader)
 
 ```jsx
@@ -734,13 +765,63 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>赵六</div>
             <div><strong>最高学历：</strong><EnumDisplay name="3" type="education" {...educationEnumApi} /></div>
             <div><strong>第二学历：</strong><EnumDisplay name="2" type="education" {...educationEnumApi} /></div>
+            <div><strong>全部学历：</strong><EnumDisplay names={['3', '2', '1']} type="education" {...educationEnumApi} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染（label 数组 toString，逗号分隔）：</p>
+            <p>学历编码 ['1', '2', '3']：<EnumDisplay names={['1', '2', '3']} type="education" {...educationEnumApi} /></p>
+            <p>学历编码 ['1', '3']：<EnumDisplay names={['1', '3']} type="education" {...educationEnumApi} /></p>
+            <p>空数组：<EnumDisplay names={[]} type="education" {...educationEnumApi} /></p>
+          </Flex>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="names 自定义渲染">
+          <EnumDisplay names={['1', '2', '3']} type="education" {...educationEnumApi}>
+            {(items, { labels, mapping, locale }) => (
+              <Flex vertical gap={8}>
+                <div>当前语言：{locale}</div>
+                <div>labels：{labels.join(' / ')}</div>
+                <Flex gap={8} wrap="wrap">
+                  {items.map((item, index) => item && (
+                    <span
+                      key={item.code}
+                      style={{ padding: '4px 8px', background: '#f0f5ff', borderRadius: '4px' }}
+                    >
+                      {item.label}
+                      {mapping.get(item.code)?.enName && &#96; (${mapping.get(item.code).enName})&#96;}
+                    </span>
+                  ))}
+                </Flex>
+              </Flex>
+            )}
+          </EnumDisplay>
         </InfoPage.Part>
         
         <InfoPage.Part title="错误处理">
-          <EnumDisplay name="999" type="education" {...educationEnumApi}>
-            {(item) => <span>{item ? item.label : '未知学历'}</span>}
-          </EnumDisplay>
+          <Flex vertical gap={12}>
+            <p>单个无效编码：</p>
+            <EnumDisplay name="999" type="education" {...educationEnumApi}>
+              {(item) => <span>{item ? item.label : '未知学历'}</span>}
+            </EnumDisplay>
+            <p>批量含无效编码（默认跳过无效项）：</p>
+            <EnumDisplay names={['1', '999', '3']} type="education" {...educationEnumApi} />
+            <p>批量含无效编码（自定义处理）：</p>
+            <EnumDisplay names={['1', '999', '3']} type="education" {...educationEnumApi}>
+              {(items, { labels }) => (
+                <span>
+                  {items.map((item, index) => (
+                    <span key={index}>
+                      {index > 0 && '、'}
+                      {item ? item.label : '未知'}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </EnumDisplay>
+          </Flex>
         </InfoPage.Part>
       </InfoPage>
     </PureGlobal>
@@ -960,7 +1041,8 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 职能编码，必需 |
+| name | string | - | 职能编码，与 names 二选一 |
+| names | string[] | - | 职能编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
 | api | object | - | 自定义 API 配置 |
@@ -968,11 +1050,20 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 职能数据对象，包含 label, chName, enName 等
   // locale: 当前语言环境
   // mapping: 所有职能数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 职能数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -989,6 +1080,9 @@ children={(item, { locale, mapping }) => {
 // 基本用法
 <FunctionEnum name="001001001" />
 
+// 批量显示
+<FunctionEnum names={['001001001', '001001002', '001001003']} />
+
 // 自定义渲染
 <FunctionEnum name="001001001">
   {(item, { locale }) => (
@@ -997,6 +1091,11 @@ children={(item, { locale, mapping }) => {
       {item.enName && <span>({item.enName})</span>}
     </div>
   )}
+</FunctionEnum>
+
+// 批量自定义渲染
+<FunctionEnum names={['001001001', '001001002']}>
+  {(items, { labels }) => labels.join(' / ')}
 </FunctionEnum>
 ```
 
@@ -1010,7 +1109,8 @@ children={(item, { locale, mapping }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 行业编码，必需 |
+| name | string | - | 行业编码，与 names 二选一 |
+| names | string[] | - | 行业编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
 | api | object | - | 自定义 API 配置 |
@@ -1018,11 +1118,20 @@ children={(item, { locale, mapping }) => {
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 行业数据对象，包含 label, chName, enName 等
   // locale: 当前语言环境
   // mapping: 所有行业数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 行业数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -1039,6 +1148,9 @@ children={(item, { locale, mapping }) => {
 // 基本用法
 <IndustryEnum name="001" />
 
+// 批量显示
+<IndustryEnum names={['001', '003', '004']} />
+
 // 自定义渲染
 <IndustryEnum name="001">
   {(item, { locale }) => (
@@ -1047,6 +1159,11 @@ children={(item, { locale, mapping }) => {
       {item.enName && <span>({item.enName})</span>}
     </div>
   )}
+</IndustryEnum>
+
+// 批量自定义渲染
+<IndustryEnum names={['001', '004']}>
+  {(items, { labels }) => labels.join(' · ')}
 </IndustryEnum>
 ```
 
@@ -1060,7 +1177,8 @@ children={(item, { locale, mapping }) => {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 枚举值编码，必需 |
+| name | string | - | 单个枚举值编码，与 names 二选一 |
+| names | string[] | - | 多个枚举值编码，与 name 二选一，默认 label 数组 toString 输出 |
 | type | string | - | 枚举类型标识 |
 | cache | string | 'ENUM_DATA' | 缓存键名 |
 | force | boolean | false | 是否强制刷新缓存 |
@@ -1092,11 +1210,21 @@ api={{
 #### 自定义渲染函数
 
 ```javascript
-children={(item, { locale, mapping }) => {
+// 单个编码 name
+children={(item, { locale, mapping, labels, names }) => {
   // item: 枚举数据对象
   // locale: 当前语言环境
   // mapping: 所有枚举数据的 Map 对象
+  // labels: 当前项的 label 数组
   return <span>{item.label}</span>;
+}}
+
+// 批量编码 names
+children={(items, { locale, mapping, labels, names }) => {
+  // items: 枚举数据对象数组，无效编码对应 undefined
+  // labels: 有效项的 label 字符串数组
+  // names: 传入的编码数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -1116,6 +1244,13 @@ children={(item, { locale, mapping }) => {
   }}
 />
 
+// 批量显示
+<EnumDisplay
+  names={['1', '2', '3']}
+  type="education"
+  api={educationEnumApi}
+/>
+
 // 自定义 getLabel
 <EnumDisplay
   name="1"
@@ -1125,6 +1260,11 @@ children={(item, { locale, mapping }) => {
     return locale === 'en-US' ? item.enName : item.name;
   }}
 />
+
+// 批量自定义渲染
+<EnumDisplay names={['1', '2', '3']} type="education" api={api}>
+  {(items, { labels }) => labels.join(' / ')}
+</EnumDisplay>
 ```
 
 ---

@@ -67,13 +67,63 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>赵六</div>
             <div><strong>最高学历：</strong><EnumDisplay name="3" type="education" {...educationEnumApi} /></div>
             <div><strong>第二学历：</strong><EnumDisplay name="2" type="education" {...educationEnumApi} /></div>
+            <div><strong>全部学历：</strong><EnumDisplay names={['3', '2', '1']} type="education" {...educationEnumApi} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染（label 数组 toString，逗号分隔）：</p>
+            <p>学历编码 ['1', '2', '3']：<EnumDisplay names={['1', '2', '3']} type="education" {...educationEnumApi} /></p>
+            <p>学历编码 ['1', '3']：<EnumDisplay names={['1', '3']} type="education" {...educationEnumApi} /></p>
+            <p>空数组：<EnumDisplay names={[]} type="education" {...educationEnumApi} /></p>
+          </Flex>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="names 自定义渲染">
+          <EnumDisplay names={['1', '2', '3']} type="education" {...educationEnumApi}>
+            {(items, { labels, mapping, locale }) => (
+              <Flex vertical gap={8}>
+                <div>当前语言：{locale}</div>
+                <div>labels：{labels.join(' / ')}</div>
+                <Flex gap={8} wrap="wrap">
+                  {items.map((item, index) => item && (
+                    <span
+                      key={item.code}
+                      style={{ padding: '4px 8px', background: '#f0f5ff', borderRadius: '4px' }}
+                    >
+                      {item.label}
+                      {mapping.get(item.code)?.enName && ` (${mapping.get(item.code).enName})`}
+                    </span>
+                  ))}
+                </Flex>
+              </Flex>
+            )}
+          </EnumDisplay>
         </InfoPage.Part>
         
         <InfoPage.Part title="错误处理">
-          <EnumDisplay name="999" type="education" {...educationEnumApi}>
-            {(item) => <span>{item ? item.label : '未知学历'}</span>}
-          </EnumDisplay>
+          <Flex vertical gap={12}>
+            <p>单个无效编码：</p>
+            <EnumDisplay name="999" type="education" {...educationEnumApi}>
+              {(item) => <span>{item ? item.label : '未知学历'}</span>}
+            </EnumDisplay>
+            <p>批量含无效编码（默认跳过无效项）：</p>
+            <EnumDisplay names={['1', '999', '3']} type="education" {...educationEnumApi} />
+            <p>批量含无效编码（自定义处理）：</p>
+            <EnumDisplay names={['1', '999', '3']} type="education" {...educationEnumApi}>
+              {(items, { labels }) => (
+                <span>
+                  {items.map((item, index) => (
+                    <span key={index}>
+                      {index > 0 && '、'}
+                      {item ? item.label : '未知'}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </EnumDisplay>
+          </Flex>
         </InfoPage.Part>
       </InfoPage>
     </PureGlobal>
