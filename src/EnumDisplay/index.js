@@ -20,6 +20,41 @@ const defaultChildren = output => {
 
 const getLabels = output => (Array.isArray(output) ? output.map(item => get(item, 'label', '')).filter(Boolean) : output ? [get(output, 'label', '')].filter(Boolean) : []);
 
+/**
+ * 将 EnumDisplay / FunctionEnum / IndustryEnum 解析结果转为选择器 value
+ * @param {Array|Object} items createEnumComponent children 第一个参数
+ * @param {Object} options valueKey / labelKey 字段映射
+ */
+export const enumItemsToSelectValue = (items, { valueKey = 'id', labelKey = 'name' } = {}) =>
+  (Array.isArray(items) ? items : [items]).filter(Boolean).map(item => ({
+    [valueKey]: item.id ?? item.code,
+    [labelKey]: item.label ?? item.name ?? item.chName
+  }));
+
+/**
+ * 将单个 Enum 解析结果转为选择器 value（单选）
+ */
+export const enumItemToSelectValue = (item, options) => enumItemsToSelectValue(item, options)[0] ?? null;
+
+/**
+ * 将 AddressEnum 解析结果转为 SelectAddress value（支持 name 单值或 names 数组）
+ */
+export const addressEnumToSelectValue = outputs => {
+  const list = Array.isArray(outputs) ? outputs : outputs ? [outputs] : [];
+  return list
+    .filter(item => item?.city)
+    .map(({ city }) => ({
+      value: city.code,
+      label: city.name,
+      ...city
+    }));
+};
+
+/**
+ * 将单个 AddressEnum 解析结果转为 SelectAddress value（单选）
+ */
+export const addressEnumToSelectValueSingle = output => addressEnumToSelectValue(output)[0] ?? null;
+
 const resolveOutput = (mapping, name, names) => {
   if (names) {
     return names.map(code => mapping.get(code));

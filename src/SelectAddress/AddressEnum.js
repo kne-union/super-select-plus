@@ -30,9 +30,31 @@ export const addressDefaultApi = {
 /**
  * 地址枚举显示组件
  */
-const AddressEnumInner = withFetch(({ data, name, children, displayParent, ...props }) => {
+const AddressEnumInner = withFetch(({ data, name, names, children, displayParent, ...props }) => {
   const { locale } = useIntl();
   const addressApi = useMemo(() => createAddressApi(data), [data]);
+
+  const formatCityData = cityData => {
+    const { city, parent } = cityData;
+    if (!city) {
+      return '';
+    }
+    if (displayParent && parent) {
+      return `${getLabelForLocal(parent, locale)}·${getLabelForLocal(city, locale)}`;
+    }
+    return getLabelForLocal(city, locale);
+  };
+
+  if (names?.length) {
+    const outputs = names.map(code => addressApi.getCity(code));
+    const labels = outputs.map(formatCityData).filter(Boolean);
+
+    if (children) {
+      return children(outputs, { displayParent, locale, getLabelForLocal, names, labels, ...props });
+    }
+
+    return labels.toString();
+  }
 
   // 获取城市数据
   const cityData = addressApi.getCity(name);

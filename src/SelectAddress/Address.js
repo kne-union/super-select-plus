@@ -11,6 +11,7 @@ import SearchInput from '@kne/search-input';
 import '@kne/search-input/dist/index.css';
 import classnames from 'classnames';
 import style from './style.module.scss';
+import { resolveAddressValue, shouldSyncSelectValue } from '../utils/resolveSelectValue';
 
 const getLabelForLocal = (item, locale) => {
   if (locale === 'en-US') {
@@ -330,12 +331,32 @@ const AddressInner = ({ value, setValue, props }) => {
 
 const SelectAddressInner = forwardRef((props, ref) => {
   const { formatMessage } = useIntl();
+  const { value, single, onChange, ...restProps } = props;
+  const [cityData, setCityData] = useState(null);
+
+  useEffect(() => {
+    defaultCityData().then(setCityData);
+  }, []);
+
+  const addressApi = useMemo(() => (cityData ? createAddressApi(cityData) : null), [cityData]);
+
+  const normalizedValue = useMemo(() => resolveAddressValue(value, addressApi, { single }), [value, addressApi, single]);
+
+  useEffect(() => {
+    if (!onChange || !addressApi) {
+      return;
+    }
+    const resolved = resolveAddressValue(value, addressApi, { single });
+    if (shouldSyncSelectValue(value, resolved, { valueKey: 'value', labelKey: 'label', single })) {
+      onChange(resolved);
+    }
+  }, [value, addressApi, single, onChange]);
 
   return (
-    <SelectInput ref={ref} {...props} placeholder={props.placeholder || formatMessage({ id: 'addressPlaceholder' }, { defaultMessage: '请选择城市' })}>
+    <SelectInput ref={ref} {...restProps} single={single} value={normalizedValue} onChange={onChange} placeholder={restProps.placeholder || formatMessage({ id: 'addressPlaceholder' }, { defaultMessage: '请选择城市' })}>
       {contextProps => {
-        const { value, setValue } = contextProps;
-        return <AddressInner value={value} setValue={setValue} props={props} />;
+        const { value: currentValue, setValue } = contextProps;
+        return <AddressInner value={currentValue} setValue={setValue} props={props} />;
       }}
     </SelectInput>
   );

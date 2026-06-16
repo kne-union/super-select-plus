@@ -4,6 +4,7 @@ import withLocale from '../withLocale';
 import { useState, useEffect, useMemo } from 'react';
 import get from 'lodash/get';
 import FunctionEnum, { getLabelForLocal } from './FunctionEnum';
+import { resolveCascaderValueFromMap, shouldSyncSelectValue } from '../utils/resolveSelectValue';
 
 const defaultFunctionData = () => {
   return import('./function.json').then(module => (module['__esModule'] ? module.default : module));
@@ -60,6 +61,30 @@ const SelectFunctionInner = ({ value, onChange, single = false, placeholder, isP
 
   const options = useMemo(() => transformToCascaderData(data, locale), [data, locale]);
 
+  const flatMapping = useMemo(() => {
+    const mapping = new Map();
+    data.forEach(item => {
+      mapping.set(item.code, {
+        ...item,
+        id: item.code,
+        name: getLabelForLocal(item, locale)
+      });
+    });
+    return mapping;
+  }, [data, locale]);
+
+  const normalizedValue = useMemo(() => resolveCascaderValueFromMap(value, flatMapping, { valueKey: 'id', labelKey: 'name', single }), [value, flatMapping, single]);
+
+  useEffect(() => {
+    if (!onChange || !flatMapping.size) {
+      return;
+    }
+    const resolved = resolveCascaderValueFromMap(value, flatMapping, { valueKey: 'id', labelKey: 'name', single });
+    if (shouldSyncSelectValue(value, resolved, { valueKey: 'id', labelKey: 'name', single })) {
+      onChange(resolved);
+    }
+  }, [value, flatMapping, single, onChange]);
+
   const handleSearch = (searchText, { mapping }) => {
     if (!searchText) return Array.from(mapping.values());
     const keyword = searchText.toLowerCase();
@@ -76,7 +101,7 @@ const SelectFunctionInner = ({ value, onChange, single = false, placeholder, isP
   return (
     <SelectCascader
       {...props}
-      value={value}
+      value={normalizedValue}
       onChange={onChange}
       single={single}
       placeholder={placeholder || formatMessage({ id: 'placeholder' }, { defaultMessage: '请选择职能' })}

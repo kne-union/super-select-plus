@@ -40,6 +40,48 @@
 }
 ```
 
+#### 值回显
+
+`value` 每项需包含 `id`（职能编码）和 `name`（显示名称）。编辑场景下后端通常只返回编码，组件会在 options 加载后自动解析 name：
+
+```javascript
+// 方式一：仅传编码，组件加载 options 后自动解析 name
+const value = ['001001001', '001001002'];
+// 或对象形式
+const value = [{ id: '001001001' }, { id: '001001002' }];
+
+// 方式二：单选回显
+const singleValue = { id: '001001001' };
+// 或字符串编码
+const singleValue = '001001001';
+
+// 方式三：结合 FunctionEnum name，单选编码回显
+<FunctionEnum name="001001001">
+  {(item) => (
+    <SelectFunction
+      single
+      value={enumItemToSelectValue(item)}
+      onChange={setValue}
+    />
+  )}
+</FunctionEnum>
+
+// 方式四：结合 FunctionEnum names，多选编码数组回显（推荐）
+const savedCodes = ['001001001', '001001002'];
+
+<FunctionEnum names={savedCodes}>
+  {(items) => {
+    const resolved = enumItemsToSelectValue(items);
+    return (
+      <SelectFunction
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</FunctionEnum>
+```
+
 ---
 
 ### SelectIndustry 行业选择器
@@ -82,6 +124,48 @@
   pinyin: 'hulianwang',     // 拼音
   spelling: 'hlw'          // 首字母缩写
 }
+```
+
+#### 值回显
+
+`value` 每项需包含 `id`（行业编码）和 `name`（显示名称）。编辑场景下后端通常只返回编码，组件会在 options 加载后自动解析 name：
+
+```javascript
+// 方式一：仅传编码，组件加载 options 后自动解析 name
+const value = ['001', '003'];
+// 或对象形式
+const value = [{ id: '001' }, { id: '003' }];
+
+// 方式二：单选回显
+const singleValue = { id: '001' };
+// 或字符串编码
+const singleValue = '001';
+
+// 方式三：结合 IndustryEnum name，单选编码回显
+<IndustryEnum name="001">
+  {(item) => (
+    <SelectIndustry
+      single
+      value={enumItemToSelectValue(item)}
+      onChange={setValue}
+    />
+  )}
+</IndustryEnum>
+
+// 方式四：结合 IndustryEnum names，多选编码数组回显（推荐）
+const savedCodes = ['001', '003'];
+
+<IndustryEnum names={savedCodes}>
+  {(items) => {
+    const resolved = enumItemsToSelectValue(items);
+    return (
+      <SelectIndustry
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</IndustryEnum>
 ```
 
 ---
@@ -139,6 +223,46 @@
 }
 ```
 
+#### 值回显
+
+编辑场景下后端通常只返回编码，组件会在数据加载后自动解析 label：
+
+```javascript
+// 方式一：仅传编码，组件加载数据后自动解析 label
+const value = [{ value: '010' }, { value: '020' }];
+
+// 方式二：单选回显
+const singleValue = { value: '010' };
+// 或字符串编码
+const singleValue = '010';
+
+// 方式三：结合 AddressEnum name，单选编码回显
+<AddressEnum name="010">
+  {(output) => (
+    <SelectAddress
+      single
+      value={addressEnumToSelectValueSingle(output)}
+      onChange={setValue}
+    />
+  )}
+</AddressEnum>
+
+// 方式四：结合 AddressEnum names，多选编码数组回显（推荐）
+const savedCodes = ['010', '020'];
+
+<AddressEnum names={savedCodes}>
+  {(outputs) => {
+    const resolved = addressEnumToSelectValue(outputs);
+    return (
+      <SelectAddress
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</AddressEnum>
+```
+
 ---
 
 ### AddressEnum 地址枚举显示组件
@@ -149,7 +273,8 @@
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 城市编码，必需 |
+| name | string | - | 城市编码，与 names 二选一 |
+| names | string[] | - | 城市编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | displayParent | boolean | false | 是否显示父级城市名称 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
@@ -158,13 +283,18 @@
 #### 自定义渲染函数
 
 ```javascript
+// 单个编码 name
 children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
   // city: 城市数据对象
   // parent: 父级城市数据对象
-  // displayParent: 是否显示父级
-  // locale: 当前语言环境
-  // getLabelForLocal: 获取本地化标签的函数
   return <span>{getLabelForLocal(city, locale)}</span>;
+}}
+
+// 批量编码 names
+children={(outputs, { labels, locale, getLabelForLocal }) => {
+  // outputs: [{ city, parent }, ...] 数组
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -181,16 +311,16 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 // 基本用法
 <AddressEnum name="010" />
 
+// 批量显示
+<AddressEnum names={['010', '020']} />
+
 // 显示父级
 <AddressEnum name="010" displayParent />
 
-// 自定义渲染
-<AddressEnum name="010">
-  {({ city, parent }, { getLabelForLocal, locale }) => (
-    <div>
-      {parent && <span>{getLabelForLocal(parent, locale)} · </span>}
-      {getLabelForLocal(city, locale)}
-    </div>
+// 结合 SelectAddress 值回显
+<AddressEnum names={['010', '020']}>
+  {(outputs) => (
+    <SelectAddress value={addressEnumToSelectValue(outputs)} />
   )}
 </AddressEnum>
 ```
@@ -429,6 +559,35 @@ children={(items, { locale, mapping, labels, names }) => {
 <EnumDisplay names={['1', '2', '3']} type="education" api={api}>
   {(items, { labels }) => labels.join(' / ')}
 </EnumDisplay>
+```
+
+#### 工具函数
+
+用于将 `names={[code, code]}` 解析结果转为选择器 `value`：
+
+| 函数 | 说明 |
+|------|------|
+| `enumItemsToSelectValue(items, options?)` | 将 FunctionEnum / IndustryEnum 的 items 转为 `{ id, name }[]`，可选 `valueKey` / `labelKey` |
+| `enumItemToSelectValue(item, options?)` | 单选：将 FunctionEnum / IndustryEnum 的 item 转为 `{ id, name }` |
+| `addressEnumToSelectValue(outputs)` | 将 AddressEnum 解析结果转为 SelectAddress 的 `{ value, label }[]`（支持 name 单值或 names 数组） |
+| `addressEnumToSelectValueSingle(output)` | 单选：将 AddressEnum name 解析结果转为 `{ value, label }` |
+
+```javascript
+import { enumItemsToSelectValue, addressEnumToSelectValue } from '@kne/super-select-plus';
+
+// 职能/行业选择器回显
+<FunctionEnum names={['001001001', '001001002']}>
+  {(items) => (
+    <SelectFunction value={enumItemsToSelectValue(items)} />
+  )}
+</FunctionEnum>
+
+// 城市选择器回显
+<AddressEnum names={['010', '020']}>
+  {(outputs) => (
+    <SelectAddress value={addressEnumToSelectValue(outputs)} />
+  )}
+</AddressEnum>
 ```
 
 ---

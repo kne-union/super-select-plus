@@ -58,13 +58,17 @@ npm i --save @kne/super-select-plus
 #### 示例代码
 
 - SelectFunction 职能选择器
-- 基于级联选择器的职能选择组件，支持多级职能数据的选择，具备搜索、单选/多选等功能
+- 基于级联选择器的职能选择组件，支持多级职能数据的选择、值回显、搜索、单选/多选等功能
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],antd(antd)
 
 ```jsx
-const { SelectFunction } = _SuperSelectPlus;
+const { SelectFunction, FunctionEnum, enumItemsToSelectValue, enumItemToSelectValue } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的职能编码
+const savedFunctionCodes = ['001001001', '001001002', '001001003'];
+const savedFunctionCode = '001001001';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -156,6 +160,137 @@ const PopupModeExample = () => {
   );
 };
 
+// 值回显 - 仅传 id，组件自动从 options 解析名称
+const ValueEchoByIdExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCodes.map((id) => ({ id })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {&#96;{ id }&#96;}）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <SelectFunction
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 仅传编码字符串数组
+const ValueEchoByCodesExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCodes);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（编码字符串数组）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <SelectFunction
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（对象编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ id: '001001001' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{&#96;{ id: '001001001' }&#96;}）：</span>
+      <SelectFunction
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectFunction
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（FunctionEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（FunctionEnum name）：</span>
+      <Tag color="default">后端编码：{savedFunctionCode}</Tag>
+      <FunctionEnum name={savedFunctionCode}>
+        {(item) => {
+          const resolved = enumItemToSelectValue(item);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectFunction
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择职能"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </FunctionEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 FunctionEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（FunctionEnum names）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <FunctionEnum names={savedFunctionCodes}>
+        {(items) => {
+          const resolved = enumItemsToSelectValue(items);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectFunction
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择职能"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </FunctionEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -180,6 +315,20 @@ const BaseExample = () => {
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
       <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByIdExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoByCodesExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
       <PopupModeExample />
     </Flex>
   );
@@ -190,13 +339,17 @@ render(<BaseExample />);
 ```
 
 - SelectIndustry 行业选择器
-- 基于级联选择器的行业选择组件，支持多级行业数据的选择，具备搜索、单选/多选等功能
+- 基于级联选择器的行业选择组件，支持多级行业数据的选择、值回显、搜索、单选/多选等功能
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],antd(antd)
 
 ```jsx
-const { SelectIndustry } = _SuperSelectPlus;
+const { SelectIndustry, IndustryEnum, enumItemsToSelectValue, enumItemToSelectValue } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的行业编码
+const savedIndustryCodes = ['001', '003', '004'];
+const savedIndustryCode = '001';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -267,6 +420,137 @@ const MaxLimitExample = ({ isPopup }) => {
   );
 };
 
+// 值回显 - 仅传 id，组件自动从 options 解析名称
+const ValueEchoByIdExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCodes.map((id) => ({ id })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {&#96;{ id }&#96;}）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <SelectIndustry
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 仅传编码字符串数组
+const ValueEchoByCodesExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCodes);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（编码字符串数组）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <SelectIndustry
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（对象编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ id: '001' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{&#96;{ id: '001' }&#96;}）：</span>
+      <SelectIndustry
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectIndustry
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（IndustryEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（IndustryEnum name）：</span>
+      <Tag color="default">后端编码：{savedIndustryCode}</Tag>
+      <IndustryEnum name={savedIndustryCode}>
+        {(item) => {
+          const resolved = enumItemToSelectValue(item);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectIndustry
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择行业"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </IndustryEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 IndustryEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（IndustryEnum names）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <IndustryEnum names={savedIndustryCodes}>
+        {(items) => {
+          const resolved = enumItemsToSelectValue(items);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectIndustry
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择行业"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </IndustryEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -290,6 +574,20 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByIdExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoByCodesExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
     </Flex>
   );
 };
@@ -299,13 +597,17 @@ render(<BaseExample />);
 ```
 
 - SelectAddress 城市选择器
-- 城市地址选择组件，支持国内外城市搜索选择，具备拼音搜索、首字母搜索等功能
+- 城市地址选择组件，支持国内外城市搜索选择、值回显，具备拼音搜索、首字母搜索等功能
 - _SuperSelectPlus(@kne/current-lib_super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],(@kne/current-lib_super-select-plus/dist/index.css),antd(antd)
 
 ```jsx
-const { SelectAddress } = _SuperSelectPlus;
+const { SelectAddress, AddressEnum, addressEnumToSelectValue, addressEnumToSelectValueSingle } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的城市编码
+const savedCityCodes = ['010', '020'];
+const savedCityCode = '010';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -376,6 +678,142 @@ const MaxLimitExample = ({ isPopup }) => {
   );
 };
 
+// 值回显 - 仅传 value 编码，组件自动解析 label
+const ValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedCityCodes.map((code) => ({ value: code })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {&#96;{ value }&#96;}）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <SelectAddress
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 完整对象（表单已缓存 label）
+const cachedCityValue = [
+  { value: '010', label: '北京' },
+  { value: '020', label: '上海' }
+];
+
+const ValueEchoWithLabelExample = ({ isPopup }) => {
+  const [value, setValue] = useState(cachedCityValue);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（含 label）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <SelectAddress
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 AddressEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（AddressEnum names）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <AddressEnum names={savedCityCodes}>
+        {(outputs) => {
+          const resolved = addressEnumToSelectValue(outputs);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectAddress
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择城市"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </AddressEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（仅编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ value: '010' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{&#96;{ value: '010' }&#96;}）：</span>
+      <SelectAddress
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedCityCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectAddress
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（AddressEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（AddressEnum name）：</span>
+      <Tag color="default">后端编码：{savedCityCode}</Tag>
+      <AddressEnum name={savedCityCode}>
+        {(output) => {
+          const resolved = addressEnumToSelectValueSingle(output);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectAddress
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择城市"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </AddressEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -399,6 +837,20 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithLabelExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
     </Flex>
   );
 };
@@ -471,7 +923,25 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>张三</div>
             <div><strong>所在城市：</strong><AddressEnum name="010" /></div>
             <div><strong>期望工作城市：</strong><AddressEnum name="020" /></div>
+            <div><strong>可接受城市：</strong><AddressEnum names={['010', '020', '050020']} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染：<AddressEnum names={['010', '020', '050020']} /></p>
+            <AddressEnum names={['010', '020']}>
+              {(outputs, { labels }) => (
+                <Flex gap={8} wrap="wrap">
+                  {labels.map(label => (
+                    <span key={label} style={{ padding: '4px 8px', background: '#f6ffed', borderRadius: '4px' }}>
+                      {label}
+                    </span>
+                  ))}
+                </Flex>
+              )}
+            </AddressEnum>
+          </Flex>
         </InfoPage.Part>
         
         <InfoPage.Part title="错误处理">
@@ -876,6 +1346,48 @@ render(<BaseExample />);
 }
 ```
 
+#### 值回显
+
+`value` 每项需包含 `id`（职能编码）和 `name`（显示名称）。编辑场景下后端通常只返回编码，组件会在 options 加载后自动解析 name：
+
+```javascript
+// 方式一：仅传编码，组件加载 options 后自动解析 name
+const value = ['001001001', '001001002'];
+// 或对象形式
+const value = [{ id: '001001001' }, { id: '001001002' }];
+
+// 方式二：单选回显
+const singleValue = { id: '001001001' };
+// 或字符串编码
+const singleValue = '001001001';
+
+// 方式三：结合 FunctionEnum name，单选编码回显
+<FunctionEnum name="001001001">
+  {(item) => (
+    <SelectFunction
+      single
+      value={enumItemToSelectValue(item)}
+      onChange={setValue}
+    />
+  )}
+</FunctionEnum>
+
+// 方式四：结合 FunctionEnum names，多选编码数组回显（推荐）
+const savedCodes = ['001001001', '001001002'];
+
+<FunctionEnum names={savedCodes}>
+  {(items) => {
+    const resolved = enumItemsToSelectValue(items);
+    return (
+      <SelectFunction
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</FunctionEnum>
+```
+
 ---
 
 ### SelectIndustry 行业选择器
@@ -918,6 +1430,48 @@ render(<BaseExample />);
   pinyin: 'hulianwang',     // 拼音
   spelling: 'hlw'          // 首字母缩写
 }
+```
+
+#### 值回显
+
+`value` 每项需包含 `id`（行业编码）和 `name`（显示名称）。编辑场景下后端通常只返回编码，组件会在 options 加载后自动解析 name：
+
+```javascript
+// 方式一：仅传编码，组件加载 options 后自动解析 name
+const value = ['001', '003'];
+// 或对象形式
+const value = [{ id: '001' }, { id: '003' }];
+
+// 方式二：单选回显
+const singleValue = { id: '001' };
+// 或字符串编码
+const singleValue = '001';
+
+// 方式三：结合 IndustryEnum name，单选编码回显
+<IndustryEnum name="001">
+  {(item) => (
+    <SelectIndustry
+      single
+      value={enumItemToSelectValue(item)}
+      onChange={setValue}
+    />
+  )}
+</IndustryEnum>
+
+// 方式四：结合 IndustryEnum names，多选编码数组回显（推荐）
+const savedCodes = ['001', '003'];
+
+<IndustryEnum names={savedCodes}>
+  {(items) => {
+    const resolved = enumItemsToSelectValue(items);
+    return (
+      <SelectIndustry
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</IndustryEnum>
 ```
 
 ---
@@ -975,6 +1529,46 @@ render(<BaseExample />);
 }
 ```
 
+#### 值回显
+
+编辑场景下后端通常只返回编码，组件会在数据加载后自动解析 label：
+
+```javascript
+// 方式一：仅传编码，组件加载数据后自动解析 label
+const value = [{ value: '010' }, { value: '020' }];
+
+// 方式二：单选回显
+const singleValue = { value: '010' };
+// 或字符串编码
+const singleValue = '010';
+
+// 方式三：结合 AddressEnum name，单选编码回显
+<AddressEnum name="010">
+  {(output) => (
+    <SelectAddress
+      single
+      value={addressEnumToSelectValueSingle(output)}
+      onChange={setValue}
+    />
+  )}
+</AddressEnum>
+
+// 方式四：结合 AddressEnum names，多选编码数组回显（推荐）
+const savedCodes = ['010', '020'];
+
+<AddressEnum names={savedCodes}>
+  {(outputs) => {
+    const resolved = addressEnumToSelectValue(outputs);
+    return (
+      <SelectAddress
+        value={value ?? resolved}
+        onChange={setValue}
+      />
+    );
+  }}
+</AddressEnum>
+```
+
 ---
 
 ### AddressEnum 地址枚举显示组件
@@ -985,7 +1579,8 @@ render(<BaseExample />);
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|-------|------|
-| name | string | - | 城市编码，必需 |
+| name | string | - | 城市编码，与 names 二选一 |
+| names | string[] | - | 城市编码数组，与 name 二选一，默认 label 数组 toString 输出 |
 | displayParent | boolean | false | 是否显示父级城市名称 |
 | force | boolean | false | 是否强制刷新缓存 |
 | children | function | - | 自定义渲染函数 |
@@ -994,13 +1589,18 @@ render(<BaseExample />);
 #### 自定义渲染函数
 
 ```javascript
+// 单个编码 name
 children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
   // city: 城市数据对象
   // parent: 父级城市数据对象
-  // displayParent: 是否显示父级
-  // locale: 当前语言环境
-  // getLabelForLocal: 获取本地化标签的函数
   return <span>{getLabelForLocal(city, locale)}</span>;
+}}
+
+// 批量编码 names
+children={(outputs, { labels, locale, getLabelForLocal }) => {
+  // outputs: [{ city, parent }, ...] 数组
+  // labels: 有效项的 label 字符串数组
+  return <span>{labels.join('、')}</span>;
 }}
 ```
 
@@ -1017,16 +1617,16 @@ children={({ city, parent }, { displayParent, locale, getLabelForLocal }) => {
 // 基本用法
 <AddressEnum name="010" />
 
+// 批量显示
+<AddressEnum names={['010', '020']} />
+
 // 显示父级
 <AddressEnum name="010" displayParent />
 
-// 自定义渲染
-<AddressEnum name="010">
-  {({ city, parent }, { getLabelForLocal, locale }) => (
-    <div>
-      {parent && <span>{getLabelForLocal(parent, locale)} · </span>}
-      {getLabelForLocal(city, locale)}
-    </div>
+// 结合 SelectAddress 值回显
+<AddressEnum names={['010', '020']}>
+  {(outputs) => (
+    <SelectAddress value={addressEnumToSelectValue(outputs)} />
   )}
 </AddressEnum>
 ```
@@ -1265,6 +1865,35 @@ children={(items, { locale, mapping, labels, names }) => {
 <EnumDisplay names={['1', '2', '3']} type="education" api={api}>
   {(items, { labels }) => labels.join(' / ')}
 </EnumDisplay>
+```
+
+#### 工具函数
+
+用于将 `names={[code, code]}` 解析结果转为选择器 `value`：
+
+| 函数 | 说明 |
+|------|------|
+| `enumItemsToSelectValue(items, options?)` | 将 FunctionEnum / IndustryEnum 的 items 转为 `{ id, name }[]`，可选 `valueKey` / `labelKey` |
+| `enumItemToSelectValue(item, options?)` | 单选：将 FunctionEnum / IndustryEnum 的 item 转为 `{ id, name }` |
+| `addressEnumToSelectValue(outputs)` | 将 AddressEnum 解析结果转为 SelectAddress 的 `{ value, label }[]`（支持 name 单值或 names 数组） |
+| `addressEnumToSelectValueSingle(output)` | 单选：将 AddressEnum name 解析结果转为 `{ value, label }` |
+
+```javascript
+import { enumItemsToSelectValue, addressEnumToSelectValue } from '@kne/super-select-plus';
+
+// 职能/行业选择器回显
+<FunctionEnum names={['001001001', '001001002']}>
+  {(items) => (
+    <SelectFunction value={enumItemsToSelectValue(items)} />
+  )}
+</FunctionEnum>
+
+// 城市选择器回显
+<AddressEnum names={['010', '020']}>
+  {(outputs) => (
+    <SelectAddress value={addressEnumToSelectValue(outputs)} />
+  )}
+</AddressEnum>
 ```
 
 ---
