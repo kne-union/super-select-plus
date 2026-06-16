@@ -1,6 +1,10 @@
-const { SelectIndustry } = _SuperSelectPlus;
+const { SelectIndustry, IndustryEnum, enumItemsToSelectValue, enumItemToSelectValue } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的行业编码
+const savedIndustryCodes = ['001', '003', '004'];
+const savedIndustryCode = '001';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -71,6 +75,137 @@ const MaxLimitExample = ({ isPopup }) => {
   );
 };
 
+// 值回显 - 仅传 id，组件自动从 options 解析名称
+const ValueEchoByIdExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCodes.map((id) => ({ id })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {`{ id }`}）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <SelectIndustry
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 仅传编码字符串数组
+const ValueEchoByCodesExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCodes);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（编码字符串数组）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <SelectIndustry
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（对象编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ id: '001' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{`{ id: '001' }`}）：</span>
+      <SelectIndustry
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedIndustryCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectIndustry
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择行业"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（IndustryEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（IndustryEnum name）：</span>
+      <Tag color="default">后端编码：{savedIndustryCode}</Tag>
+      <IndustryEnum name={savedIndustryCode}>
+        {(item) => {
+          const resolved = enumItemToSelectValue(item);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectIndustry
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择行业"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </IndustryEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 IndustryEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（IndustryEnum names）：</span>
+      <Tag color="default">后端编码：{savedIndustryCodes.join('、')}</Tag>
+      <IndustryEnum names={savedIndustryCodes}>
+        {(items) => {
+          const resolved = enumItemsToSelectValue(items);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectIndustry
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择行业"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </IndustryEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -94,6 +229,20 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByIdExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoByCodesExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
     </Flex>
   );
 };

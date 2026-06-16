@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "SelectFunction 职能选择器",
-      "description": "基于级联选择器的职能选择组件，支持多级职能数据的选择，具备搜索、单选/多选等功能",
+      "description": "基于级联选择器的职能选择组件，支持多级职能数据的选择、值回显、搜索、单选/多选等功能",
       "code": "./select-function.js",
       "scope": [
         {
@@ -19,7 +19,7 @@
     },
     {
       "title": "SelectIndustry 行业选择器",
-      "description": "基于级联选择器的行业选择组件，支持多级行业数据的选择，具备搜索、单选/多选等功能",
+      "description": "基于级联选择器的行业选择组件，支持多级行业数据的选择、值回显、搜索、单选/多选等功能",
       "code": "./select-industry.js",
       "scope": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "title": "SelectAddress 城市选择器",
-      "description": "城市地址选择组件，支持国内外城市搜索选择，具备拼音搜索、首字母搜索等功能",
+      "description": "城市地址选择组件，支持国内外城市搜索选择、值回显，具备拼音搜索、首字母搜索等功能",
       "code": "./select-address.js",
       "scope": [
         {

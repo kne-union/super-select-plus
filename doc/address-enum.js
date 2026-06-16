@@ -57,7 +57,25 @@ const BaseExample = createWithRemoteLoader({
             <div><strong>姓名：</strong>张三</div>
             <div><strong>所在城市：</strong><AddressEnum name="010" /></div>
             <div><strong>期望工作城市：</strong><AddressEnum name="020" /></div>
+            <div><strong>可接受城市：</strong><AddressEnum names={['010', '020', '050020']} /></div>
           </div>
+        </InfoPage.Part>
+
+        <InfoPage.Part title="批量显示 names">
+          <Flex vertical gap={12}>
+            <p>默认渲染：<AddressEnum names={['010', '020', '050020']} /></p>
+            <AddressEnum names={['010', '020']}>
+              {(outputs, { labels }) => (
+                <Flex gap={8} wrap="wrap">
+                  {labels.map(label => (
+                    <span key={label} style={{ padding: '4px 8px', background: '#f6ffed', borderRadius: '4px' }}>
+                      {label}
+                    </span>
+                  ))}
+                </Flex>
+              )}
+            </AddressEnum>
+          </Flex>
         </InfoPage.Part>
         
         <InfoPage.Part title="错误处理">

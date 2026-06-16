@@ -1,6 +1,10 @@
-const { SelectAddress } = _SuperSelectPlus;
+const { SelectAddress, AddressEnum, addressEnumToSelectValue, addressEnumToSelectValueSingle } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的城市编码
+const savedCityCodes = ['010', '020'];
+const savedCityCode = '010';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -71,6 +75,142 @@ const MaxLimitExample = ({ isPopup }) => {
   );
 };
 
+// 值回显 - 仅传 value 编码，组件自动解析 label
+const ValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedCityCodes.map((code) => ({ value: code })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {`{ value }`}）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <SelectAddress
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 完整对象（表单已缓存 label）
+const cachedCityValue = [
+  { value: '010', label: '北京' },
+  { value: '020', label: '上海' }
+];
+
+const ValueEchoWithLabelExample = ({ isPopup }) => {
+  const [value, setValue] = useState(cachedCityValue);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（含 label）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <SelectAddress
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 AddressEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（AddressEnum names）：</span>
+      <Tag color="default">后端编码：{savedCityCodes.join('、')}</Tag>
+      <AddressEnum names={savedCityCodes}>
+        {(outputs) => {
+          const resolved = addressEnumToSelectValue(outputs);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectAddress
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择城市"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </AddressEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（仅编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ value: '010' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{`{ value: '010' }`}）：</span>
+      <SelectAddress
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedCityCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectAddress
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择城市"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（AddressEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（AddressEnum name）：</span>
+      <Tag color="default">后端编码：{savedCityCode}</Tag>
+      <AddressEnum name={savedCityCode}>
+        {(output) => {
+          const resolved = addressEnumToSelectValueSingle(output);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectAddress
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择城市"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </AddressEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -94,6 +234,20 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithLabelExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
     </Flex>
   );
 };

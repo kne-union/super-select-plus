@@ -1,6 +1,10 @@
-const { SelectFunction } = _SuperSelectPlus;
+const { SelectFunction, FunctionEnum, enumItemsToSelectValue, enumItemToSelectValue } = _SuperSelectPlus;
 const { Flex, Divider, Tag, Switch } = antd;
 const { useState } = React;
+
+// 模拟后端接口返回的职能编码
+const savedFunctionCodes = ['001001001', '001001002', '001001003'];
+const savedFunctionCode = '001001001';
 
 // 基础多选示例
 const BasicMultiExample = ({ isPopup }) => {
@@ -92,6 +96,137 @@ const PopupModeExample = () => {
   );
 };
 
+// 值回显 - 仅传 id，组件自动从 options 解析名称
+const ValueEchoByIdExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCodes.map((id) => ({ id })));
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（仅编码 {`{ id }`}）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <SelectFunction
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 仅传编码字符串数组
+const ValueEchoByCodesExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCodes);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（编码字符串数组）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <SelectFunction
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（对象编码）
+const SingleValueEchoExample = ({ isPopup }) => {
+  const [value, setValue] = useState({ id: '001001001' });
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（{`{ id: '001001001' }`}）：</span>
+      <SelectFunction
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（字符串编码）
+const SingleValueEchoByCodeExample = ({ isPopup }) => {
+  const [value, setValue] = useState(savedFunctionCode);
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（编码字符串）：</span>
+      <SelectFunction
+        single
+        value={value}
+        onChange={setValue}
+        isPopup={isPopup}
+        placeholder="请选择职能"
+        style={{ width: 320 }}
+      />
+    </Flex>
+  );
+};
+
+// 值回显 - 单选（FunctionEnum name）
+const SingleValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>单选值回显（FunctionEnum name）：</span>
+      <Tag color="default">后端编码：{savedFunctionCode}</Tag>
+      <FunctionEnum name={savedFunctionCode}>
+        {(item) => {
+          const resolved = enumItemToSelectValue(item);
+          if (!resolved) return <span>加载中...</span>;
+          return (
+            <SelectFunction
+              single
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择职能"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </FunctionEnum>
+    </Flex>
+  );
+};
+
+// 值回显 - 结合 FunctionEnum，仅传编码数组 names={[code, code]}
+const ValueEchoWithEnumExample = ({ isPopup }) => {
+  const [value, setValue] = useState();
+
+  return (
+    <Flex vertical gap={8}>
+      <span>值回显（FunctionEnum names）：</span>
+      <Tag color="default">后端编码：{savedFunctionCodes.join('、')}</Tag>
+      <FunctionEnum names={savedFunctionCodes}>
+        {(items) => {
+          const resolved = enumItemsToSelectValue(items);
+          if (!resolved.length) return <span>加载中...</span>;
+          return (
+            <SelectFunction
+              value={value ?? resolved}
+              onChange={setValue}
+              isPopup={isPopup}
+              placeholder="请选择职能"
+              style={{ width: 320 }}
+            />
+          );
+        }}
+      </FunctionEnum>
+    </Flex>
+  );
+};
+
 const BaseExample = () => {
   const [isPopup, setIsPopup] = useState(true);
 
@@ -115,6 +250,20 @@ const BaseExample = () => {
       <SingleSelectExample isPopup={isPopup} />
       <Divider />
       <MaxLimitExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>单选值回显</span>
+      <SingleValueEchoExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoByCodeExample isPopup={isPopup} />
+      <Divider />
+      <SingleValueEchoWithEnumExample isPopup={isPopup} />
+      <Divider />
+      <span style={{ fontWeight: 500 }}>多选值回显</span>
+      <ValueEchoByIdExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoByCodesExample isPopup={isPopup} />
+      <Divider />
+      <ValueEchoWithEnumExample isPopup={isPopup} />
       <Divider />
       <PopupModeExample />
     </Flex>
