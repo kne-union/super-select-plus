@@ -106,6 +106,7 @@ const SelectFunctionInner = ({ value, onChange, single = false, placeholder, isP
       single={single}
       placeholder={placeholder || formatMessage({ id: 'placeholder' }, { defaultMessage: '请选择职能' })}
       isPopup={isPopup}
+      overlayWidth={overlayWidth}
       menuItemWidth={200}
       style={{ width: overlayWidth, ...props.style }}
       options={options}

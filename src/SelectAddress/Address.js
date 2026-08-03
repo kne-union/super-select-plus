@@ -331,7 +331,7 @@ const AddressInner = ({ value, setValue, props }) => {
 
 const SelectAddressInner = forwardRef((props, ref) => {
   const { formatMessage } = useIntl();
-  const { value, single, onChange, ...restProps } = props;
+  const { value, single, onChange, overlayWidth = 500, ...restProps } = props;
   const [cityData, setCityData] = useState(null);
 
   useEffect(() => {
@@ -353,7 +353,15 @@ const SelectAddressInner = forwardRef((props, ref) => {
   }, [value, addressApi, single, onChange]);
 
   return (
-    <SelectInput ref={ref} {...restProps} single={single} value={normalizedValue} onChange={onChange} placeholder={restProps.placeholder || formatMessage({ id: 'addressPlaceholder' }, { defaultMessage: '请选择城市' })}>
+    <SelectInput
+      ref={ref}
+      {...restProps}
+      single={single}
+      value={normalizedValue}
+      onChange={onChange}
+      overlayWidth={overlayWidth}
+      placeholder={restProps.placeholder || formatMessage({ id: 'addressPlaceholder' }, { defaultMessage: '请选择城市' })}
+    >
       {contextProps => {
         const { value: currentValue, setValue } = contextProps;
         return <AddressInner value={currentValue} setValue={setValue} props={props} />;
