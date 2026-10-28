@@ -168,3 +168,78 @@
 .item-label {
   font-size: 14px;
 }
+
+// 移动端半屏（@kne/super-select 的 select-mobile-sheet）：左栏浅灰底、选中项白底主色，热门标签放大到可点击尺寸
+:global(.select-mobile-sheet) .address {
+  .col-left {
+    background: rgba(17, 24, 39, 0.03);
+
+    :global {
+      .ant-tabs-nav::before {
+        display: none;
+      }
+    }
+  }
+
+  .menu-list {
+    background: transparent;
+
+    :global {
+      .ant-list-item {
+        border-radius: 0;
+        font-size: 16px;
+
+        &.selected {
+          background-color: #fff;
+          font-weight: 600;
+
+          &:hover {
+            background-color: #fff;
+          }
+        }
+      }
+    }
+  }
+
+  .col-right {
+    border-left: none;
+  }
+
+  .title {
+    margin: 12px 0 8px;
+
+    &::before,
+    &::after,
+    :global(.ant-divider-rail) {
+      display: none;
+    }
+
+    :global(.ant-divider-inner-text) {
+      padding: 0;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--font-color-grey, rgba(0, 0, 0, 0.55));
+    }
+  }
+
+  .scroll-box :global(.ant-space) {
+    gap: 8px !important;
+  }
+
+  :global(.ant-tag-checkable) {
+    height: 32px;
+    margin: 0;
+    padding: 0 14px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(17, 24, 39, 0.05);
+    color: var(--font-color, rgba(0, 0, 0, 0.88));
+    font-size: 15px;
+    line-height: 32px;
+
+    &:global(.ant-tag-checkable-checked) {
+      background: var(--primary-color-1, #e6f4ff);
+      color: var(--primary-color, #1677ff);
+    }
+  }
+}
