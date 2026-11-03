@@ -232,10 +232,14 @@
     padding: 0 14px;
     border: none;
     border-radius: 16px;
-    background: rgba(17, 24, 39, 0.05);
+    background: transparent;
     color: var(--font-color, rgba(0, 0, 0, 0.88));
     font-size: 15px;
     line-height: 32px;
+
+    &:not(:global(.ant-tag-checkable-checked)):hover {
+      background: transparent;
+    }
 
     &:global(.ant-tag-checkable-checked) {
       background: var(--primary-color-1, #e6f4ff);
