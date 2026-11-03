@@ -239,6 +239,8 @@ const AddressInner = ({ value, setValue, props }) => {
         onSearch={value => {
           setSearchText(value);
         }}
+        simple={props.isPopup}
+        showSearchButton={!props.isPopup}
       />
       <div className={style['content']}>
         {searchInner || (
